@@ -9,7 +9,7 @@ import (
 	"github.com/sjwhitworth/golearn/trees"
 )
 
-func main() {
+func AlgorithmTree() {
 
 	// Load dataset
 	data_cem, err := base.ParseCSVToInstances("dataset/casos_cem_2020_lima.csv", true)
