@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 
 	"github.com/sjwhitworth/golearn/base"
 	"github.com/sjwhitworth/golearn/evaluation"
@@ -12,10 +16,16 @@ import (
 func AlgorithmTree() {
 
 	// Load dataset
-	data_cem, err := base.ParseCSVToInstances("dataset/casos_cem_2020_lima.csv", true)
+	response, err := http.Get("https://raw.githubusercontent.com/Concurrente/Backend/main/dataset/casos_cem_2020_lima.csv")
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
+	defer response.Body.Close()
+	body, err := io.ReadAll(response.Body)
+	fileBytes := bytes.NewReader(body)
+
+	data_cem, err := base.ParseCSVToInstancesFromReader(fileBytes, true)
 
 	// Discretise the dataset with Chi-Merge
 	filt := filters.NewChiMergeFilter(data_cem, 0.999)
