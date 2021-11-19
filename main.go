@@ -8,18 +8,17 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-/*
 type consulta struct {
-    peruana  	bool
-	embarazada  bool
-	hijos  		bool
-	trabaja  	bool
-	edad 		bool
-	casada 		bool
-	estudia 	bool
-	seguro  	bool
+	peruana    bool
+	embarazada bool
+	hijos      bool
+	trabaja    bool
+	edad       bool
+	casada     bool
+	estudia    bool
+	seguro     bool
+	distrito   string
 }
-*/
 
 func main() {
 
