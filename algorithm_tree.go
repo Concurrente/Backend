@@ -13,13 +13,13 @@ import (
 	"github.com/sjwhitworth/golearn/trees"
 )
 
-func AlgorithmTree() {
+//Decision tree -> return distric and probability
+func AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito string) (string, float64) {
 
 	// Load dataset
 	response, err := http.Get("https://raw.githubusercontent.com/Concurrente/Backend/main/dataset/casos_cem_2020_lima.csv")
 	if err != nil {
 		log.Println(err)
-		return
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
@@ -65,31 +65,23 @@ func AlgorithmTree() {
 	}
 
 	newInst.AddClassAttribute(newInst.AllAttributes()[8])
-	fmt.Println(newInst)
+	//fmt.Println(newInst)
 	newInst.Extend(1)
 
 	//Values to evaluate
-	VICTIMA_PERUANA := "1"
-	EDAD_VICTIMA := "25"
-	VICTIMA_GESTANDO := "0"
-	TIENE_HIJOS := "0"
-	ESTADO_CIVIL_VICTIMA := "1"
-	ESTUDIA := "0"
-	TRABAJA_VICTIMA := "1"
-	TIENE_SEGURO := "1"
 
 	//District to evaluate
-	entry_dsitrtict := "San Juan de Lurigancho"
+	entry_dsitrtict := distrito
 
 	//Values to evaluate
-	newInst.Set(newSpecs[0], 0, newSpecs[0].GetAttribute().GetSysValFromString(VICTIMA_PERUANA))
-	newInst.Set(newSpecs[1], 0, newSpecs[1].GetAttribute().GetSysValFromString(EDAD_VICTIMA))
-	newInst.Set(newSpecs[2], 0, newSpecs[2].GetAttribute().GetSysValFromString(VICTIMA_GESTANDO))
-	newInst.Set(newSpecs[3], 0, newSpecs[3].GetAttribute().GetSysValFromString(TIENE_HIJOS))
-	newInst.Set(newSpecs[4], 0, newSpecs[4].GetAttribute().GetSysValFromString(ESTADO_CIVIL_VICTIMA))
-	newInst.Set(newSpecs[5], 0, newSpecs[5].GetAttribute().GetSysValFromString(ESTUDIA))
-	newInst.Set(newSpecs[6], 0, newSpecs[6].GetAttribute().GetSysValFromString(TRABAJA_VICTIMA))
-	newInst.Set(newSpecs[7], 0, newSpecs[7].GetAttribute().GetSysValFromString(TIENE_SEGURO))
+	newInst.Set(newSpecs[0], 0, newSpecs[0].GetAttribute().GetSysValFromString(peruana))
+	newInst.Set(newSpecs[1], 0, newSpecs[1].GetAttribute().GetSysValFromString(edad))
+	newInst.Set(newSpecs[2], 0, newSpecs[2].GetAttribute().GetSysValFromString(embarazada))
+	newInst.Set(newSpecs[3], 0, newSpecs[3].GetAttribute().GetSysValFromString(hijos))
+	newInst.Set(newSpecs[4], 0, newSpecs[4].GetAttribute().GetSysValFromString(casada))
+	newInst.Set(newSpecs[5], 0, newSpecs[5].GetAttribute().GetSysValFromString(estudia))
+	newInst.Set(newSpecs[6], 0, newSpecs[6].GetAttribute().GetSysValFromString(trabaja))
+	newInst.Set(newSpecs[7], 0, newSpecs[7].GetAttribute().GetSysValFromString(seguro))
 
 	///////////////////////////////////////////////////////////////
 
@@ -114,22 +106,27 @@ func AlgorithmTree() {
 	}
 	fmt.Println(predictions_proba)
 
+	var dist string
+	var valuer float64
+
 	//Evaluate if the district is in the array
 	founded := false
 	for _, v := range predictions_proba {
 		if entry_dsitrtict == v.ClassValue {
-			dist := v.ClassValue
-			valuer := v.Probability
+			dist = v.ClassValue
+			valuer = v.Probability
 			fmt.Println("Distrito: ", dist)
 			fmt.Println("Probabilidad: ", valuer)
 			founded = true
 		}
 	}
 	if founded == false {
-		dist := entry_dsitrtict
-		valuer := 0
+		dist = entry_dsitrtict
+		valuer = 0.00
 		fmt.Println("Distrito: ", dist)
 		fmt.Println("Probabilidad: ", valuer)
 	}
+
+	return dist, valuer
 
 }
