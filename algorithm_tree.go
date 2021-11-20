@@ -14,7 +14,7 @@ import (
 )
 
 //Decision tree -> return distric and probability
-func AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito string) (string, float64) {
+func AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito string) float64 {
 
 	// Load dataset
 	response, err := http.Get("https://raw.githubusercontent.com/Concurrente/Backend/main/dataset/casos_cem_2020_lima.csv")
@@ -127,6 +127,6 @@ func AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, s
 		fmt.Println("Probabilidad: ", valuer)
 	}
 
-	return dist, valuer
+	return valuer
 
 }

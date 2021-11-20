@@ -40,7 +40,7 @@ func consultaPorcentaje(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Set("Content-Type", "application/json")
 
 	//Respuesta de Porcentaje
-	porcentaje := funcion(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito) //Funcion
+	porcentaje := AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito) //Funcion
 	//serializar
 	jsonBytes, _ := json.MarshalIndent(porcentaje, "", " ")
 	io.WriteString(resp, string(jsonBytes))
