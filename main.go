@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type ConsultaBono struct {
+type ConsultaPorcentaje struct {
 	Peruana    string `json:"peruana"`
 	Embarazada string `json:"embarazada"`
 	Hijos      string `json:"hijos"`
@@ -43,26 +43,13 @@ func consultaPorcentaje(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Expose-Headers", "Authorization")
 	//1.-Forma de recuperar parametros de entrada
 	//req.Header().Set("Content-type", "application/json")
-	var usuario = ConsultaBono{}
-	peruana := req.FormValue("peruana")
-	embarazada := req.FormValue("embarazada")
-	hijos := req.FormValue("hijos")
-	trabaja := req.FormValue("trabaja")
-	edad := req.FormValue("edad")
-	casada := req.FormValue("casada")
-	estudia := req.FormValue("estudiav")
-	seguro := req.FormValue("seguro")
-	distrito := req.FormValue("distrito")
+	var consultaPorcentaje = ConsultaPorcentaje{}
 
-	usuario.Peruana = peruana
-	usuario.Embarazada = embarazada
-	usuario.Hijos = hijos
-	usuario.Trabaja = trabaja
-	usuario.Edad = edad
-	usuario.Casada = casada
-	usuario.Estudia = estudia
-	usuario.Seguro = seguro
-	usuario.Distrito = distrito
+	err := json.NewDecoder(req.Body).Decode(&consultaPorcentaje)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	/*
 		peruana := "1"
@@ -76,20 +63,20 @@ func consultaPorcentaje(res http.ResponseWriter, req *http.Request) {
 		distrito := "San Juan de Lurigancho"
 	*/
 
-	log.Println(usuario.Peruana, usuario.Embarazada, usuario.Hijos, usuario.Trabaja, usuario.Edad, usuario.Casada, usuario.Estudia, usuario.Seguro, usuario.Distrito)
+	log.Println(consultaPorcentaje.Peruana, consultaPorcentaje.Embarazada, consultaPorcentaje.Hijos, consultaPorcentaje.Trabaja, consultaPorcentaje.Edad, consultaPorcentaje.Casada, consultaPorcentaje.Estudia, consultaPorcentaje.Seguro, consultaPorcentaje.Distrito)
 
 	//res.Header().Set("Content-Type", "application/json")
 
 	//Respuesta de Porcentaje
-	enviar(usuario.Peruana)
-	enviar(usuario.Embarazada)
-	enviar(usuario.Hijos)
-	enviar(usuario.Trabaja)
-	enviar(usuario.Edad)
-	enviar(usuario.Casada)
-	enviar(usuario.Estudia)
-	enviar(usuario.Seguro)
-	enviar(usuario.Distrito)
+	enviar(consultaPorcentaje.Peruana)
+	enviar(consultaPorcentaje.Embarazada)
+	enviar(consultaPorcentaje.Hijos)
+	enviar(consultaPorcentaje.Trabaja)
+	enviar(consultaPorcentaje.Edad)
+	enviar(consultaPorcentaje.Casada)
+	enviar(consultaPorcentaje.Estudia)
+	enviar(consultaPorcentaje.Seguro)
+	enviar(consultaPorcentaje.Distrito)
 	//porcentaje := AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito) //Funcion
 
 	//poner en modo escucha, recepcion
