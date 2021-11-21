@@ -1,30 +1,27 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 )
 
-/*estructura
-type consulta struct {
-	peruana    string
-	embarazada string
-	hijos      string
-	trabaja    string
-	edad       string
-	casada     string
-	estudia    string
-	seguro     string
-	distrito   string
+func enviar(consulta string) {
+	con, _ := net.Dial("tcp", "localhost:9800")
+	defer con.Close()
+	fmt.Fprint(con, consulta)
 }
-*/
 
 func consultaPorcentaje(resp http.ResponseWriter, req *http.Request) {
 	log.Println("Ingreso a Consulta")
 
 	//1.-Forma de recuperar parametros de entrada
+
 	peruana := req.FormValue("peruana")
 	embarazada := req.FormValue("embarazada")
 	hijos := req.FormValue("hijos")
@@ -35,15 +32,55 @@ func consultaPorcentaje(resp http.ResponseWriter, req *http.Request) {
 	seguro := req.FormValue("seguro")
 	distrito := req.FormValue("distrito")
 
+	/*
+		peruana := "1"
+		embarazada := "1"
+		hijos := "0"
+		trabaja := "1"
+		edad := "25"
+		casada := "1"
+		estudia := "0"
+		seguro := "1"
+		distrito := "San Juan de Lurigancho"
+	*/
+
 	log.Println(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito)
 
 	resp.Header().Set("Content-Type", "application/json")
 
 	//Respuesta de Porcentaje
-	porcentaje := AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito) //Funcion
+	enviar(peruana)
+	enviar(embarazada)
+	enviar(hijos)
+	enviar(trabaja)
+	enviar(edad)
+	enviar(casada)
+	enviar(estudia)
+	enviar(seguro)
+	enviar(distrito)
+	//porcentaje := AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito) //Funcion
+
+	//poner en modo escucha, recepcion
+	ln, _ := net.Listen("tcp", "localhost:9801") //ln -> listen
+
+	defer ln.Close()
+
+	con2, _ := ln.Accept() //acepta la conexion
+
+	defer con2.Close()
+
+	bufferIn := bufio.NewReader(con2)
+
+	probabilidad, _ := bufferIn.ReadString('\n')
+
+	probabilidad = strings.TrimSpace(probabilidad)
+	//fmt.Printf("La probabilidad es %d\n", msg)
+	fmt.Println("Probabilidad: ", probabilidad)
+
 	//serializar
-	jsonBytes, _ := json.MarshalIndent(porcentaje, "", " ")
+	jsonBytes, _ := json.MarshalIndent(probabilidad, "", " ")
 	io.WriteString(resp, string(jsonBytes))
+
 }
 
 func mostrarInicio(resp http.ResponseWriter, req *http.Request) {

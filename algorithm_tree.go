@@ -1,17 +1,83 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 
 	"github.com/sjwhitworth/golearn/base"
 	"github.com/sjwhitworth/golearn/evaluation"
 	"github.com/sjwhitworth/golearn/filters"
 	"github.com/sjwhitworth/golearn/trees"
 )
+
+var n int
+
+var chCont chan int //control de sincronizacion
+
+var s []string
+
+func server() {
+	//valores a esperar
+	n = 9
+	chCont = make(chan int, 1) //canal asincrono
+	chCont <- 0
+	//nodo servidor
+	ln, _ := net.Listen("tcp", "localhost:9800")
+	defer ln.Close()
+
+	//manejo de multiples conexiones
+	for {
+		con, _ := ln.Accept()
+		go manejadorConexiones(con) //trabajar de forma concurrente
+	}
+}
+
+func manejadorConexiones(con net.Conn) {
+	//cada servicio tiene una logica
+	//cada manejador que va atender una conexion entrante aplica esa logica
+	//Aplicamos la lógica del servicio
+	defer con.Close()
+
+	buffIn := bufio.NewReader(con)
+	msg, _ := buffIn.ReadString('\n')
+	msg = strings.TrimSpace(msg)
+	//num, _ := strconv.Atoi(msg)
+
+	fmt.Printf("Llegó el valor %d\n", msg)
+
+	//evaluamos la cantidad de numeros que van pasando por el servicio
+	cont := <-chCont
+
+	s = append(s, msg)
+	//fmt.Println("Llegó el valor %d\n", s)
+	//fmt.Println("Llegó el valor %d\n", cont)
+
+	cont++
+	//evaluar si llegó la todos los valores
+	if cont == n {
+		//fmt.Printf("El valor final es %d\n", msg)
+		fmt.Println(s)
+		proba := AlgorithmTree(s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7], s[8])
+		probability := fmt.Sprintf("%f", proba)
+		enviar_respuesta(probability)
+		cont = 0
+		s = nil
+	}
+
+	chCont <- cont //cont actualizado
+}
+
+func enviar_respuesta(value string) {
+	con, _ := net.Dial("tcp", "localhost:9801")
+	defer con.Close()
+	fmt.Fprint(con, value)
+}
 
 //Decision tree -> return distric and probability
 func AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito string) float64 {
