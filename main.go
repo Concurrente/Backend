@@ -11,17 +11,39 @@ import (
 	"strings"
 )
 
+type ConsultaBono struct {
+	Peruana    string `json:"peruana"`
+	Embarazada string `json:"embarazada"`
+	Hijos      string `json:"hijos"`
+	Trabaja    string `json:"trabaja"`
+	Edad       string `json:"edad"`
+	Casada     string `json:"casada"`
+	Estudia    string `json:"estudia"`
+	Seguro     string `json:"seguro"`
+	Distrito   string `json:"distrito"`
+}
+
 func enviar(consulta string) {
 	con, _ := net.Dial("tcp", "localhost:9800")
 	defer con.Close()
 	fmt.Fprint(con, consulta)
 }
 
-func consultaPorcentaje(resp http.ResponseWriter, req *http.Request) {
+func consultaPorcentaje(res http.ResponseWriter, req *http.Request) {
 	log.Println("Ingreso a Consulta")
 
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+	log.Println("Llamada al endpoint /knn")
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+	res.Header().Set("Content-Type", "application/json; charset=utf-8")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+	res.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	res.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	res.Header().Set("Access-Control-Expose-Headers", "Authorization")
 	//1.-Forma de recuperar parametros de entrada
-
+	//req.Header().Set("Content-type", "application/json")
+	var usuario = ConsultaBono{}
 	peruana := req.FormValue("peruana")
 	embarazada := req.FormValue("embarazada")
 	hijos := req.FormValue("hijos")
@@ -31,6 +53,16 @@ func consultaPorcentaje(resp http.ResponseWriter, req *http.Request) {
 	estudia := req.FormValue("estudiav")
 	seguro := req.FormValue("seguro")
 	distrito := req.FormValue("distrito")
+
+	usuario.Peruana = peruana
+	usuario.Embarazada = embarazada
+	usuario.Hijos = hijos
+	usuario.Trabaja = trabaja
+	usuario.Edad = edad
+	usuario.Casada = casada
+	usuario.Estudia = estudia
+	usuario.Seguro = seguro
+	usuario.Distrito = distrito
 
 	/*
 		peruana := "1"
@@ -44,20 +76,20 @@ func consultaPorcentaje(resp http.ResponseWriter, req *http.Request) {
 		distrito := "San Juan de Lurigancho"
 	*/
 
-	log.Println(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito)
+	log.Println(usuario.Peruana, usuario.Embarazada, usuario.Hijos, usuario.Trabaja, usuario.Edad, usuario.Casada, usuario.Estudia, usuario.Seguro, usuario.Distrito)
 
-	resp.Header().Set("Content-Type", "application/json")
+	//res.Header().Set("Content-Type", "application/json")
 
 	//Respuesta de Porcentaje
-	enviar(peruana)
-	enviar(embarazada)
-	enviar(hijos)
-	enviar(trabaja)
-	enviar(edad)
-	enviar(casada)
-	enviar(estudia)
-	enviar(seguro)
-	enviar(distrito)
+	enviar(usuario.Peruana)
+	enviar(usuario.Embarazada)
+	enviar(usuario.Hijos)
+	enviar(usuario.Trabaja)
+	enviar(usuario.Edad)
+	enviar(usuario.Casada)
+	enviar(usuario.Estudia)
+	enviar(usuario.Seguro)
+	enviar(usuario.Distrito)
 	//porcentaje := AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito) //Funcion
 
 	//poner en modo escucha, recepcion
@@ -79,7 +111,7 @@ func consultaPorcentaje(resp http.ResponseWriter, req *http.Request) {
 
 	//serializar
 	jsonBytes, _ := json.MarshalIndent(probabilidad, "", " ")
-	io.WriteString(resp, string(jsonBytes))
+	io.WriteString(res, string(jsonBytes))
 
 }
 
