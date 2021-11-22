@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+var nodo string = "localhost:9800"
+var nodo2 string = "localhost:9700"
+var nodo3 string = "localhost:9600"
+
 type ConsultaPorcentaje struct {
 	Peruana    string `json:"peruana"`
 	Embarazada string `json:"embarazada"`
@@ -24,7 +28,7 @@ type ConsultaPorcentaje struct {
 }
 
 func enviar(consulta string) {
-	con, err := net.Dial("tcp", "localhost:9800")
+	con, err := net.Dial("tcp", nodo2)
 	if err != nil {
 		log.Printf("aqui10")
 		panic(err)
