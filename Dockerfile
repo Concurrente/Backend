@@ -1,30 +1,10 @@
-FROM golang:1.16-alpine
+FROM golang:1.15-alpine AS GO_BUILD
+COPY . /server
+WORKDIR /server/server
+RUN go build -o /go/bin/server/server
 
-# Set destination for COPY
-WORKDIR /app
-
-# Download Go modules
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
-
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/engine/reference/builder/#copy
-COPY *.go ./
-
-# Build
-RUN go build -o /app
-
-# This is for documentation purposes only.
-# To actually open the port, runtime parameters
-# must be supplied to the docker command.
-EXPOSE 8080
-
-# (Optional) environment variable that our dockerised
-# application can make use of. The value of environment
-# variables can also be set via parameters supplied
-# to the docker command on the command line.
-#ENV HTTP_PORT=8081
-
-# Run
-CMD [ "/app" ]
+FROM alpine:3.10
+WORKDIR app
+COPY --from=GO_BUILD /go/bin/server/ ./
+EXPOSE 9000
+CMD ./server
