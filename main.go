@@ -24,7 +24,11 @@ type ConsultaPorcentaje struct {
 }
 
 func enviar(consulta string) {
-	con, _ := net.Dial("tcp", "localhost:9800")
+	con, err := net.Dial("tcp", "localhost:9800")
+	if err != nil {
+		log.Printf("aqui10")
+		panic(err)
+	}
 	defer con.Close()
 	fmt.Fprint(con, consulta)
 }
@@ -80,12 +84,18 @@ func consultaPorcentaje(res http.ResponseWriter, req *http.Request) {
 	//porcentaje := AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, seguro, distrito) //Funcion
 
 	//poner en modo escucha, recepcion
-	ln, _ := net.Listen("tcp", "localhost:9801") //ln -> listen
-
+	ln, err := net.Listen("tcp", "localhost:9801") //ln -> listen
+	if err != nil {
+		log.Printf("aqui")
+		panic(err)
+	}
 	defer ln.Close()
 
-	con2, _ := ln.Accept() //acepta la conexion
-
+	con2, err := ln.Accept() //acepta la conexion
+	if err != nil {
+		log.Printf("aqui2")
+		panic(err)
+	}
 	defer con2.Close()
 
 	bufferIn := bufio.NewReader(con2)
@@ -97,7 +107,11 @@ func consultaPorcentaje(res http.ResponseWriter, req *http.Request) {
 	fmt.Println("Probabilidad: ", probabilidad)
 
 	//serializar
-	jsonBytes, _ := json.MarshalIndent(probabilidad, "", " ")
+	jsonBytes, err := json.MarshalIndent(probabilidad, "", " ")
+	if err != nil {
+		log.Printf("aqu4")
+		panic(err)
+	}
 	io.WriteString(res, string(jsonBytes))
 
 }
@@ -121,5 +135,6 @@ func handleRequest() {
 }
 
 func main() {
+	//go server()
 	handleRequest()
 }

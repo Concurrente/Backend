@@ -22,18 +22,26 @@ var chCont chan int //control de sincronizacion
 
 var s []string
 
-func server() {
+func main() {
 	//valores a esperar
 	n = 9
 	chCont = make(chan int, 1) //canal asincrono
 	chCont <- 0
 	//nodo servidor
-	ln, _ := net.Listen("tcp", "localhost:9800")
+	ln, err := net.Listen("tcp", "localhost:9800")
+	if err != nil {
+		log.Printf("aqu5")
+		panic(err)
+	}
 	defer ln.Close()
 
 	//manejo de multiples conexiones
 	for {
-		con, _ := ln.Accept()
+		con, err := ln.Accept()
+		if err != nil {
+			log.Printf("aqu55")
+			panic(err)
+		}
 		go manejadorConexiones(con) //trabajar de forma concurrente
 	}
 }
@@ -42,11 +50,11 @@ func manejadorConexiones(con net.Conn) {
 	//cada servicio tiene una logica
 	//cada manejador que va atender una conexion entrante aplica esa logica
 	//Aplicamos la lógica del servicio
-	defer con.Close()
 
 	buffIn := bufio.NewReader(con)
 	msg, _ := buffIn.ReadString('\n')
 	msg = strings.TrimSpace(msg)
+	defer con.Close()
 	//num, _ := strconv.Atoi(msg)
 
 	fmt.Printf("Llegó el valor %d\n", msg)
@@ -69,12 +77,15 @@ func manejadorConexiones(con net.Conn) {
 		cont = 0
 		s = nil
 	}
-
 	chCont <- cont //cont actualizado
 }
 
 func enviar_respuesta(value string) {
-	con, _ := net.Dial("tcp", "localhost:9801")
+	con, err := net.Dial("tcp", "localhost:9801")
+	if err != nil {
+		log.Printf("aqu7")
+		panic(err)
+	}
 	defer con.Close()
 	fmt.Fprint(con, value)
 }
@@ -89,9 +100,17 @@ func AlgorithmTree(peruana, embarazada, hijos, trabaja, edad, casada, estudia, s
 	}
 	defer response.Body.Close()
 	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Printf("aqu4")
+		panic(err)
+	}
 	fileBytes := bytes.NewReader(body)
 
 	data_cem, err := base.ParseCSVToInstancesFromReader(fileBytes, true)
+	if err != nil {
+		log.Printf("aqu4")
+		panic(err)
+	}
 
 	// Discretise the dataset with Chi-Merge
 	filt := filters.NewChiMergeFilter(data_cem, 0.999)
