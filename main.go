@@ -6,14 +6,19 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var nodo string = "localhost:9800"
 var nodo2 string = "localhost:9700"
 var nodo3 string = "localhost:9600"
+
+var nodomain string
+var num int = 1
 
 type ConsultaPorcentaje struct {
 	Peruana    string `json:"peruana"`
@@ -27,8 +32,28 @@ type ConsultaPorcentaje struct {
 	Distrito   string `json:"distrito"`
 }
 
+func asignarNodo() {
+
+	rand.Seed(time.Now().Unix())
+	min := 1
+	max := 3
+	num = min + rand.Intn(max-min+1)
+	if num == 2 {
+		nodomain = nodo2
+		return
+	} else if num == 3 {
+		nodomain = nodo3
+		return
+	} else {
+		nodomain = nodo
+		return
+	}
+
+}
+
 func enviar(consulta string) {
-	con, err := net.Dial("tcp", nodo2)
+
+	con, err := net.Dial("tcp", nodomain)
 	if err != nil {
 		log.Printf("aqui10")
 		panic(err)
@@ -74,7 +99,8 @@ func consultaPorcentaje(res http.ResponseWriter, req *http.Request) {
 	log.Println(consultaPorcentaje.Peruana, consultaPorcentaje.Embarazada, consultaPorcentaje.Hijos, consultaPorcentaje.Trabaja, consultaPorcentaje.Edad, consultaPorcentaje.Casada, consultaPorcentaje.Estudia, consultaPorcentaje.Seguro, consultaPorcentaje.Distrito)
 
 	//res.Header().Set("Content-Type", "application/json")
-
+	asignarNodo()
+	fmt.Println("El nodo seleccionado es: ", nodomain)
 	//Respuesta de Porcentaje
 	enviar(consultaPorcentaje.Peruana)
 	enviar(consultaPorcentaje.Embarazada)
@@ -140,5 +166,6 @@ func handleRequest() {
 
 func main() {
 	//go server()
+
 	handleRequest()
 }
